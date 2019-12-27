@@ -2,6 +2,12 @@ package de.butzlabben.sudoku;
 
 
 import org.junit.Test;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.util.Arrays;
+
 import static org.junit.Assert.*;
 
 public class SudokuGameTest {
@@ -39,21 +45,46 @@ public class SudokuGameTest {
 
     @Test
     public void initializeRandom() {
+        SudokuGame game = new SudokuGame();
+        game.initializeRandom();
+        assertNotNull(game.getValues());
+        boolean equals = Arrays.deepEquals(game.getValues(), new int[9][9]);
+        assertFalse(equals);
     }
 
     @Test
     public void set() {
+        SudokuGame game = new SudokuGame(board);
+        assertTrue(game.set(0, 0, 5));
+        assertFalse(game.set(0, 0, 8));
     }
 
     @Test
     public void isCurrentlyValid() {
+        SudokuGame game = new SudokuGame(board);
+        assertTrue(game.isCurrentlyValid());
+        game.getValues()[0][0] = 8;
+        assertFalse(game.isCurrentlyValid());
     }
 
     @Test
     public void print() {
+        SudokuGame game = new SudokuGame(board);
+        // Little workaround so we can a local variable here
+        final boolean[] printed = {false};
+        System.setOut(new PrintStream(new OutputStream() {
+            @Override
+            public void write(int b) throws IOException {
+                printed[0] = true;
+            }
+        }));
+        game.print();
+        assertTrue(printed[0]);
     }
 
     @Test
     public void getValues() {
+        SudokuGame game = new SudokuGame(board);
+        assertArrayEquals(board, game.getValues());
     }
 }
