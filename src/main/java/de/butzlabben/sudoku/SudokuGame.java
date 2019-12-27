@@ -13,6 +13,8 @@ import java.util.Random;
 @AllArgsConstructor
 public class SudokuGame {
 
+    private final static int DEVIATION_MEAN_DIFFICULTY = 4;
+
     // First value is the row, second the column
     @Getter
     private int[][] values;
@@ -53,12 +55,28 @@ public class SudokuGame {
         return false;
     }
 
-    public void initializeRandom() {
+    public void initializeRandom(Difficulty difficulty) {
         values = new int[9][9];
         Random random = new Random();
-        // Random number between 20 and 30
-        int numberCount = 21 + random.nextInt(10);
+        fillBox(0, 0);
+        fillBox(3, 3);
+        fillBox(6, 6);
+        solve();
+        int deviation = random.nextInt(DEVIATION_MEAN_DIFFICULTY * 2 + 1) - DEVIATION_MEAN_DIFFICULTY;
+        int numbersToRemove = difficulty.meanNumbersToRemove - deviation;
+        for (int i = 0; i < numbersToRemove; i++) {
+            int row, column;
+            do {
+                row = random.nextInt(9);
+                column = random.nextInt(9);
+            } while(values[row][column] == 0);
 
+            values[row][column] = 0;
+        }
+    }
+
+    public void initializeRandom() {
+        initializeRandom(Difficulty.EASY);
     }
 
     /**
@@ -74,6 +92,25 @@ public class SudokuGame {
             return false;
         values[row][column] = value;
         return true;
+    }
+
+    /**
+     * Fills random a 3x3 box
+     *
+     * @param row
+     * @param column
+     */
+    private void fillBox(int row, int column) {
+        Random random = new Random();
+        for (int i = row; i < row + 3; i++) {
+            for (int j = column; j < column + 3; j++) {
+                int number;
+                do {
+                    number = 1 + random.nextInt(9);
+                }
+                while (!set(i, j, number));
+            }
+        }
     }
 
     public boolean isCurrentlyValid() {

@@ -15,7 +15,7 @@ public class Main {
                 {0, 0, 1, 0, 6, 5, 0, 0, 4}
         }; // Source: https://www.raetseldino.de/sudoku-schwer/sudoku-16-sehr-schwer.jpg
         SudokuGame game = new SudokuGame(board);
-//        game.initializeRandom();
+        game.initializeRandom(Difficulty.HARD);
         game.print();
         game.solve();
         game.print();
