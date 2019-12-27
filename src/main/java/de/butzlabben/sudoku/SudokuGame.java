@@ -1,39 +1,64 @@
 package de.butzlabben.sudoku;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.Arrays;
 import java.util.Random;
 
 @Builder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
 public class SudokuGame {
 
     // First value is the row, second the column
     @Getter
-    private int[][] values = new int[9][9];
+    private int[][] values;
+
+    /**
+     * Solves the sudoku via the backtrace algorithm
+     */
+    public boolean solve() {
+        int row = 0, column = 0;
+        boolean isCompletelyFilled = true;
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                if (values[i][j] == 0) {
+                    row = i;
+                    column = j;
+                    isCompletelyFilled = false;
+                    break;
+                }
+            }
+            if (!isCompletelyFilled) break;
+        }
+
+        if (isCompletelyFilled) return true;
+        for (int value = 1; value <= 9; value++) {
+            SudokuGame copy = toBuilder().build();
+            if (copy.set(row, column, value)) {
+                // We can set the value safely, as we know, that is valid
+                values[row][column] = value;
+
+                // Check if board is completely filled
+                if (solve()) {
+                    return true;
+                }
+            }
+            // If we come back here, reset value
+            values[row][column] = 0;
+        }
+        return false;
+    }
 
     public void initializeRandom() {
+        values = new int[9][9];
         Random random = new Random();
-        // Random number between 10 and 20
-        int numberCount = 11 + random.nextInt(10);
+        // Random number between 20 and 30
+        int numberCount = 21 + random.nextInt(10);
 
-        for (int i = 0; i < numberCount; i++) {
-            // Generate random row and column values
-            int row = random.nextInt(9);
-            int column = random.nextInt(9);
-            // Check if a value isn't already set in this place
-            while (values[row][column] != 0) {
-                row = random.nextInt(9);
-                column = random.nextInt(9);
-            }
-
-            int value = 1 + random.nextInt(9);
-            // Set random values until it is valid
-            while (!set(row, column, value)) {
-                value = 1 + random.nextInt(9);
-            }
-        }
     }
 
     /**
@@ -63,7 +88,7 @@ public class SudokuGame {
 
     private boolean isFieldValid(int row, int column) {
         int number = values[row][column];
-        if(number == 0)
+        if (number == 0)
             return true;
         boolean rowValid = !isRepeatedInRow(row, number);
         boolean columnValid = !isRepeatedInColumn(column, number);
