@@ -95,10 +95,7 @@ public class SudokuGame {
     }
 
     /**
-     * Fills random a 3x3 box
-     *
-     * @param row
-     * @param column
+     * Fills randomly a 3x3 box
      */
     private void fillBox(int row, int column) {
         Random random = new Random();
